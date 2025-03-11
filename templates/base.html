@@ -4,10 +4,8 @@
   <title>{% block title %}Cloud Storage{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <!-- Font Awesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" 
-        integrity="sha512-KyZXEAg3QhqLMpG8r+Knujsl5/6g9wZt5w2SdY+U5AZt7xN5XDv5IkzlpZ56wW3R9+R+4TzYjGjC5LLkTkHfCg==" 
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
 </head>
 <body>
 <nav class="navbar navbar-expand-lg">
@@ -17,7 +15,8 @@
       <!-- Theme Toggle Button -->
       <li class="nav-item">
         <button id="theme-toggle" class="btn theme-toggle-btn" title="Toggle Theme">
-          <i id="theme-icon" class="fas"></i>
+          <!-- Default icon is moon for light theme -->
+          <i id="theme-icon" class="bi bi-moon"></i>
         </button>
       </li>
       {% if current_user.is_authenticated %}
@@ -57,12 +56,12 @@
   function setTheme(theme) {
     if (theme === 'dark') {
       document.body.classList.add('dark-mode');
-      themeIcon.classList.remove('fa-moon');
-      themeIcon.classList.add('fa-sun');
+      themeIcon.classList.remove('bi-moon');
+      themeIcon.classList.add('bi-sun');
     } else {
       document.body.classList.remove('dark-mode');
-      themeIcon.classList.remove('fa-sun');
-      themeIcon.classList.add('fa-moon');
+      themeIcon.classList.remove('bi-sun');
+      themeIcon.classList.add('bi-moon');
     }
     localStorage.setItem('theme', theme);
   }
@@ -79,27 +78,27 @@
     }
   });
 
-  // On hover, show the opposite icon for a cool effect
+  // On hover, swap icon to show the opposite theme's icon for a cool effect
   themeToggleButton.addEventListener('mouseenter', function() {
     if(document.body.classList.contains('dark-mode')){
-      themeIcon.classList.remove('fa-sun');
-      themeIcon.classList.add('fa-moon');
+      themeIcon.classList.remove('bi-sun');
+      themeIcon.classList.add('bi-moon');
     } else {
-      themeIcon.classList.remove('fa-moon');
-      themeIcon.classList.add('fa-sun');
+      themeIcon.classList.remove('bi-moon');
+      themeIcon.classList.add('bi-sun');
     }
   });
   themeToggleButton.addEventListener('mouseleave', function() {
     if(document.body.classList.contains('dark-mode')){
-      themeIcon.classList.remove('fa-moon');
-      themeIcon.classList.add('fa-sun');
+      themeIcon.classList.remove('bi-moon');
+      themeIcon.classList.add('bi-sun');
     } else {
-      themeIcon.classList.remove('fa-sun');
-      themeIcon.classList.add('fa-moon');
+      themeIcon.classList.remove('bi-sun');
+      themeIcon.classList.add('bi-moon');
     }
   });
 
-  // Initialize theme from localStorage
+  // Initialize theme from localStorage on page load
   window.onload = function(){
     var savedTheme = localStorage.getItem('theme') || 'light';
     setTheme(savedTheme);
