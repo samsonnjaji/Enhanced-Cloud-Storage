@@ -1,12 +1,18 @@
 {% extends "base.html" %}
 {% block title %}Upload File{% endblock %}
 {% block content %}
-<h1>Upload File</h1>
-<form method="post">
-    <div class="form-group">
+<div class="card mx-auto" style="max-width: 500px;">
+  <div class="card-header">
+    <h2>Upload File</h2>
+  </div>
+  <div class="card-body">
+    <form method="post">
+      <div class="form-group">
         <label for="filename">Filename</label>
         <input type="text" class="form-control" id="filename" name="filename" placeholder="Enter file name" required>
-    </div>
-    <button type="submit" class="btn btn-success">Upload</button>
-</form>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Upload</button>
+    </form>
+  </div>
+</div>
 {% endblock %}

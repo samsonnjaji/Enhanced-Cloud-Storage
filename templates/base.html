@@ -1,15 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{% block title %}Cloud Storage{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <title>{% block title %}Cloud Storage{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" 
+        integrity="sha512-KyZXEAg3QhqLMpG8r+Knujsl5/6g9wZt5w2SdY+U5AZt7xN5XDv5IkzlpZ56wW3R9+R+4TzYjGjC5LLkTkHfCg==" 
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg">
   <a class="navbar-brand" href="{{ url_for('index') }}">Cloud Storage</a>
   <div class="collapse navbar-collapse">
-    <ul class="navbar-nav ml-auto">
+    <ul class="navbar-nav ml-auto align-items-center">
+      <!-- Theme Toggle Button -->
+      <li class="nav-item">
+        <button id="theme-toggle" class="btn theme-toggle-btn" title="Toggle Theme">
+          <i id="theme-icon" class="fas"></i>
+        </button>
+      </li>
       {% if current_user.is_authenticated %}
       <li class="nav-item">
         <a class="nav-link" href="{{ url_for('upload') }}">Upload</a>
@@ -28,6 +38,7 @@
     </ul>
   </div>
 </nav>
+
 <div class="container mt-4">
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
@@ -40,5 +51,59 @@
   {% endwith %}
   {% block content %}{% endblock %}
 </div>
+
+<script>
+  // Function to set theme and update icon accordingly
+  function setTheme(theme) {
+    if (theme === 'dark') {
+      document.body.classList.add('dark-mode');
+      themeIcon.classList.remove('fa-moon');
+      themeIcon.classList.add('fa-sun');
+    } else {
+      document.body.classList.remove('dark-mode');
+      themeIcon.classList.remove('fa-sun');
+      themeIcon.classList.add('fa-moon');
+    }
+    localStorage.setItem('theme', theme);
+  }
+
+  const themeToggleButton = document.getElementById('theme-toggle');
+  const themeIcon = document.getElementById('theme-icon');
+
+  // Toggle theme on click
+  themeToggleButton.addEventListener('click', function() {
+    if(document.body.classList.contains('dark-mode')){
+      setTheme('light');
+    } else {
+      setTheme('dark');
+    }
+  });
+
+  // On hover, show the opposite icon for a cool effect
+  themeToggleButton.addEventListener('mouseenter', function() {
+    if(document.body.classList.contains('dark-mode')){
+      themeIcon.classList.remove('fa-sun');
+      themeIcon.classList.add('fa-moon');
+    } else {
+      themeIcon.classList.remove('fa-moon');
+      themeIcon.classList.add('fa-sun');
+    }
+  });
+  themeToggleButton.addEventListener('mouseleave', function() {
+    if(document.body.classList.contains('dark-mode')){
+      themeIcon.classList.remove('fa-moon');
+      themeIcon.classList.add('fa-sun');
+    } else {
+      themeIcon.classList.remove('fa-sun');
+      themeIcon.classList.add('fa-moon');
+    }
+  });
+
+  // Initialize theme from localStorage
+  window.onload = function(){
+    var savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+  }
+</script>
 </body>
 </html>

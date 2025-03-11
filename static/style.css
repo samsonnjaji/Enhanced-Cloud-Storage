@@ -1,3 +1,113 @@
+/* Global Styles - Light Theme */
 body {
-    padding-top: 60px;
-}
+    background-color: #f0f2f5;
+    color: #333;
+    transition: background-color 0.3s, color 0.3s;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  
+  /* Navbar & Theme Toggle */
+  .navbar {
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .navbar .navbar-brand,
+  .navbar .nav-link {
+    color: #333;
+    font-weight: 500;
+  }
+  .theme-toggle-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    outline: none;
+  }
+  .theme-toggle-btn i {
+    font-size: 1.8rem;
+    transition: transform 0.3s, color 0.3s;
+  }
+  .theme-toggle-btn:hover i {
+    transform: rotate(360deg);
+    color: #ffc107;
+  }
+  
+  /* Card Styling */
+  .card {
+    background-color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  .card-header {
+    padding: 1.5rem;
+  }
+  .bg-gradient-primary {
+    background: linear-gradient(90deg, #007bff, #00c6ff);
+  }
+  
+  /* Table & Empty State */
+  .table thead.bg-light {
+    background-color: #f8f9fa !important;
+  }
+  .empty-state {
+    padding: 3rem 0;
+  }
+  .empty-state-icon i {
+    font-size: 3rem;
+  }
+  
+  /* Button Overrides */
+  .btn {
+    border-radius: 25px;
+  }
+  
+  /* Alerts */
+  .alert {
+    background-color: #fff;
+    color: #333;
+    border-color: #ddd;
+  }
+  
+  /* Dark Mode Overrides */
+  body.dark-mode {
+    background-color: #18191A;
+    color: #e4e6eb;
+  }
+  body.dark-mode .navbar {
+    background-color: #242526;
+    box-shadow: none;
+  }
+  body.dark-mode .navbar .navbar-brand,
+  body.dark-mode .navbar .nav-link {
+    color: #e4e6eb;
+  }
+  body.dark-mode .card {
+    background-color: #242526;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+  }
+  body.dark-mode .table thead.bg-light {
+    background-color: #343a40 !important;
+    color: #e4e6eb;
+  }
+  body.dark-mode .empty-state-icon i,
+  body.dark-mode .text-secondary {
+    color: #ced4da !important;
+  }
+  body.dark-mode .btn-primary {
+    background-color: #4a90e2;
+    border-color: #4a90e2;
+  }
+  body.dark-mode .btn-light {
+    background-color: #3a3b3c;
+    color: #e4e6eb;
+  }
+  body.dark-mode .alert {
+    background-color: #3a3b3c;
+    color: #e4e6eb;
+    border-color: #4e4f50;
+  }
+  
+  /* Additional Utility Classes */
+  .fw-bold { font-weight: bold; }
+  .fw-medium { font-weight: 500; }
+  
