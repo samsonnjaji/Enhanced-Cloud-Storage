@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
 app = Flask(__name__)
@@ -18,8 +19,14 @@ login_manager.login_view = 'login'
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
-    password = db.Column(db.String(150), nullable=False)
+    password_hash = db.Column(db.String(256), nullable=False)
     files = db.relationship('File', backref='owner', lazy=True)
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
 
 class File(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -56,7 +63,7 @@ def upload():
 @login_required
 def update(file_id):
     file = File.query.get_or_404(file_id)
-    if file.owner != current_user:
+    if file.user_id != current_user.id:  # Fixed ownership check
         flash('You are not authorized to update this file', 'danger')
         return redirect(url_for('index'))
     if request.method == 'POST':
@@ -72,7 +79,7 @@ def update(file_id):
 @login_required
 def delete(file_id):
     file = File.query.get_or_404(file_id)
-    if file.owner != current_user:
+    if file.user_id != current_user.id:  # Fixed ownership check
         flash('You are not authorized to delete this file', 'danger')
         return redirect(url_for('index'))
     db.session.delete(file)
@@ -90,12 +97,12 @@ def register():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        # In production, passwords should be hashed.
         if username and password:
             if User.query.filter_by(username=username).first():
                 flash('Username already exists', 'danger')
             else:
-                new_user = User(username=username, password=password)
+                new_user = User(username=username)
+                new_user.set_password(password)  # Hash password
                 db.session.add(new_user)
                 db.session.commit()
                 flash('Registration successful! Please log in.', 'success')
@@ -109,8 +116,8 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        user = User.query.filter_by(username=username, password=password).first()  # For production, use password hashing.
-        if user:
+        user = User.query.filter_by(username=username).first()
+        if user and user.check_password(password):
             login_user(user)
             flash('Logged in successfully!', 'success')
             return redirect(url_for('index'))
@@ -126,7 +133,6 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == '__main__':
-    # Create database if it does not exist.
-    if not os.path.exists('cloud_storage.db'):
-        db.create_all()
+    with app.app_context():
+        db.create_all()  # Ensure tables exist
     app.run(debug=True)
