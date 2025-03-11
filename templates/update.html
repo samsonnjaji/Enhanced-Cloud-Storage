@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Update File{% endblock %}
+{% block content %}
+<h1>Update File</h1>
+<form method="post">
+    <div class="form-group">
+        <label for="new_filename">New Filename</label>
+        <input type="text" class="form-control" id="new_filename" name="new_filename" value="{{ file.filename }}" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Update</button>
+</form>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Upload File{% endblock %}
+{% block content %}
+<h1>Upload File</h1>
+<form method="post">
+    <div class="form-group">
+        <label for="filename">Filename</label>
+        <input type="text" class="form-control" id="filename" name="filename" placeholder="Enter file name" required>
+    </div>
+    <button type="submit" class="btn btn-success">Upload</button>
+</form>
+{% endblock %}

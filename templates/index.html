@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}My Files{% endblock %}
+{% block content %}
+<h1>Your Files</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Filename</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for file in files %}
+        <tr>
+            <td>{{ file.id }}</td>
+            <td>{{ file.filename }}</td>
+            <td>
+                <a class="btn btn-primary btn-sm" href="{{ url_for('update', file_id=file.id) }}">Edit</a>
+                <form action="{{ url_for('delete', file_id=file.id) }}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
