@@ -63,7 +63,7 @@ def upload():
 @login_required
 def update(file_id):
     file = File.query.get_or_404(file_id)
-    if file.user_id != current_user.id:  # Fixed ownership check
+    if file.user_id != current_user.id:  # Ownership check
         flash('You are not authorized to update this file', 'danger')
         return redirect(url_for('index'))
     if request.method == 'POST':
@@ -79,7 +79,7 @@ def update(file_id):
 @login_required
 def delete(file_id):
     file = File.query.get_or_404(file_id)
-    if file.user_id != current_user.id:  # Fixed ownership check
+    if file.user_id != current_user.id:  # Ownership check
         flash('You are not authorized to delete this file', 'danger')
         return redirect(url_for('index'))
     db.session.delete(file)
@@ -102,7 +102,7 @@ def register():
                 flash('Username already exists', 'danger')
             else:
                 new_user = User(username=username)
-                new_user.set_password(password)  # Hash password
+                new_user.set_password(password)  # Hash the password
                 db.session.add(new_user)
                 db.session.commit()
                 flash('Registration successful! Please log in.', 'success')
@@ -135,4 +135,6 @@ def logout():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # Ensure tables exist
-    app.run(debug=True)
+    # Use the PORT environment variable if set (required for deployment platforms like Vercel)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
