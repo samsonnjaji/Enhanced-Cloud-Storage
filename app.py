@@ -1,23 +1,13 @@
 import os
-import firebase_admin
-from firebase_admin import credentials, storage
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
-from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
-
-cred = credentials.Certificate("serviceAccountKey.json")
-firebase_admin.initialize_app(cred, {
-    'storageBucket': 'your-firebase-project-id.appspot.com'
-})
-bucket = storage.bucket()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cloud_storage.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['UPLOAD_FOLDER'] = 'uploads'
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
@@ -38,7 +28,6 @@ class User(db.Model, UserMixin):
 class File(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.String(150), nullable=False)
-    firebase_url = db.Column(db.String(500), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 @login_manager.user_loader
@@ -55,27 +44,15 @@ def index():
 @login_required
 def upload():
     if request.method == 'POST':
-        if 'file' not in request.files:
-            flash('No file selected!', 'danger')
-            return redirect(request.url)
-
-        file = request.files['file']
-        if file.filename == '':
-            flash('No selected file!', 'danger')
-            return redirect(request.url)
-
-        filename = secure_filename(file.filename)
-        blob = bucket.blob(f'uploads/{current_user.id}/{filename}')
-        blob.upload_from_file(file)
-        blob.make_public()
-        firebase_url = blob.public_url
-
-        new_file = File(filename=filename, firebase_url=firebase_url, user_id=current_user.id)
-        db.session.add(new_file)
-        db.session.commit()
-
-        flash('File uploaded successfully!', 'success')
-        return redirect(url_for('index'))
+        filename = request.form.get('filename')
+        if filename:
+            new_file = File(filename=filename, user_id=current_user.id)
+            db.session.add(new_file)
+            db.session.commit()
+            flash('File uploaded successfully!', 'success')
+            return redirect(url_for('index'))
+        else:
+            flash('No filename provided!', 'danger')
     return render_template('upload.html')
 
 @app.route('/update/<int:file_id>', methods=['GET', 'POST'])
@@ -92,6 +69,8 @@ def update(file_id):
             db.session.commit()
             flash('File updated successfully!', 'success')
             return redirect(url_for('index'))
+        else:
+            flash('No filename provided!', 'danger')
     return render_template('update.html', file=file)
 
 @app.route('/delete/<int:file_id>', methods=['POST'])
@@ -101,12 +80,8 @@ def delete(file_id):
     if file.user_id != current_user.id:
         flash('Unauthorized action!', 'danger')
         return redirect(url_for('index'))
-
-    blob = bucket.blob(f'uploads/{current_user.id}/{file.filename}')
-    blob.delete()
     db.session.delete(file)
     db.session.commit()
-
     flash('File deleted successfully!', 'success')
     return redirect(url_for('index'))
 
@@ -117,15 +92,16 @@ def register():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        if User.query.filter_by(username=username).first():
-            flash('Username already exists', 'danger')
-        else:
-            new_user = User(username=username)
-            new_user.set_password(password)
-            db.session.add(new_user)
-            db.session.commit()
-            flash('Registration successful! Please log in.', 'success')
-            return redirect(url_for('login'))
+        if username and password:
+            if User.query.filter_by(username=username).first():
+                flash('Username already exists', 'danger')
+            else:
+                new_user = User(username=username)
+                new_user.set_password(password)
+                db.session.add(new_user)
+                db.session.commit()
+                flash('Registration successful! Please log in.', 'success')
+                return redirect(url_for('login'))
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
