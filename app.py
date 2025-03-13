@@ -1,5 +1,4 @@
 import os
-import traceback
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
@@ -8,10 +7,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
 
-# Determine the base directory
+# Use /tmp when running on Vercel, otherwise use local folder
 basedir = os.path.abspath(os.path.dirname(__file__))
-
-# Use /tmp for Vercel; otherwise, use the local project directory
 if os.environ.get('VERCEL'):
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:////tmp/cloud_storage.db')
 else:
@@ -42,12 +39,13 @@ class File(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+@app.before_first_request
+def create_tables():
+    db.create_all()
+
 @app.errorhandler(Exception)
 def handle_exception(e):
-    # Print the exception and traceback for debugging
-    print("Exception occurred:", e)
-    traceback.print_exc()
-    flash("An internal error occurred. Please try again later.", "danger")
+    print("Exception:", e)
     return render_template("error.html"), 500
 
 @app.route('/')
@@ -69,7 +67,7 @@ def upload():
                 flash('File uploaded successfully!', 'success')
             except Exception as e:
                 flash('Failed to upload file.', 'danger')
-                print("Upload error:", e)
+                print("Upload Error:", e)
             return redirect(url_for('index'))
         else:
             flash('No filename provided!', 'danger')
@@ -91,7 +89,7 @@ def update(file_id):
                 flash('File updated successfully!', 'success')
             except Exception as e:
                 flash('Failed to update file.', 'danger')
-                print("Update error:", e)
+                print("Update Error:", e)
             return redirect(url_for('index'))
         else:
             flash('No filename provided!', 'danger')
@@ -110,7 +108,7 @@ def delete(file_id):
         flash('File deleted successfully!', 'success')
     except Exception as e:
         flash('Failed to delete file.', 'danger')
-        print("Delete error:", e)
+        print("Delete Error:", e)
     return redirect(url_for('index'))
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -133,7 +131,7 @@ def register():
                     return redirect(url_for('login'))
                 except Exception as e:
                     flash('Registration failed.', 'danger')
-                    print("Registration error:", e)
+                    print("Registration Error:", e)
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -160,7 +158,5 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)
