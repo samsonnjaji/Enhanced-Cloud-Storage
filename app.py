@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cloud_storage.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://sibona:2004@localhost/sibonadb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -86,7 +86,7 @@ def delete(file_id):
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        logout_user()  # Force log out so that registration redirects to login
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
