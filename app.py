@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'mysql+pymysql://sibona:2004@localhost/sibonadb')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///cloud_storage.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -18,8 +18,10 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(150), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
     files = db.relationship('File', backref='owner', lazy=True)
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
+
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
