@@ -7,7 +7,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
 
-# Use /tmp when running on Vercel, otherwise use local folder
 basedir = os.path.abspath(os.path.dirname(__file__))
 if os.environ.get('VERCEL'):
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:////tmp/cloud_storage.db')
