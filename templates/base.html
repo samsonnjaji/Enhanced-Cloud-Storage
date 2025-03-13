@@ -4,7 +4,7 @@
   <title>{% block title %}Cloud Storage{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <!-- Bootstrap Icons -->
+  
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
 </head>
 <body>
@@ -12,10 +12,10 @@
   <a class="navbar-brand" href="{{ url_for('index') }}">Cloud Storage</a>
   <div class="collapse navbar-collapse">
     <ul class="navbar-nav ml-auto align-items-center">
-      <!-- Theme Toggle Button -->
+      
       <li class="nav-item">
         <button id="theme-toggle" class="btn theme-toggle-btn" title="Toggle Theme">
-          <!-- Default icon is moon for light theme -->
+          
           <i id="theme-icon" class="bi bi-moon"></i>
         </button>
       </li>
@@ -52,7 +52,7 @@
 </div>
 
 <script>
-  // Function to set theme and update icon accordingly
+  
   function setTheme(theme) {
     if (theme === 'dark') {
       document.body.classList.add('dark-mode');
@@ -69,7 +69,7 @@
   const themeToggleButton = document.getElementById('theme-toggle');
   const themeIcon = document.getElementById('theme-icon');
 
-  // Toggle theme on click
+
   themeToggleButton.addEventListener('click', function() {
     if(document.body.classList.contains('dark-mode')){
       setTheme('light');
@@ -78,7 +78,7 @@
     }
   });
 
-  // On hover, swap icon to show the opposite theme's icon for a cool effect
+  
   themeToggleButton.addEventListener('mouseenter', function() {
     if(document.body.classList.contains('dark-mode')){
       themeIcon.classList.remove('bi-sun');
@@ -98,7 +98,7 @@
     }
   });
 
-  // Initialize theme from localStorage on page load
+  
   window.onload = function(){
     var savedTheme = localStorage.getItem('theme') || 'light';
     setTheme(savedTheme);
