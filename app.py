@@ -1,4 +1,5 @@
 import os
+import traceback
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user, UserMixin
@@ -6,11 +7,16 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
+
+# Determine the base directory
 basedir = os.path.abspath(os.path.dirname(__file__))
+
+# Use /tmp for Vercel; otherwise, use the local project directory
 if os.environ.get('VERCEL'):
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:////tmp/cloud_storage.db')
 else:
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///' + os.path.join(basedir, 'cloud_storage.db'))
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -38,7 +44,10 @@ def load_user(user_id):
 
 @app.errorhandler(Exception)
 def handle_exception(e):
-    print("Exception:", e)
+    # Print the exception and traceback for debugging
+    print("Exception occurred:", e)
+    traceback.print_exc()
+    flash("An internal error occurred. Please try again later.", "danger")
     return render_template("error.html"), 500
 
 @app.route('/')
@@ -53,10 +62,14 @@ def upload():
     if request.method == 'POST':
         filename = request.form.get('filename')
         if filename:
-            new_file = File(filename=filename, user_id=current_user.id)
-            db.session.add(new_file)
-            db.session.commit()
-            flash('File uploaded successfully!', 'success')
+            try:
+                new_file = File(filename=filename, user_id=current_user.id)
+                db.session.add(new_file)
+                db.session.commit()
+                flash('File uploaded successfully!', 'success')
+            except Exception as e:
+                flash('Failed to upload file.', 'danger')
+                print("Upload error:", e)
             return redirect(url_for('index'))
         else:
             flash('No filename provided!', 'danger')
@@ -72,9 +85,13 @@ def update(file_id):
     if request.method == 'POST':
         new_filename = request.form.get('new_filename')
         if new_filename:
-            file.filename = new_filename
-            db.session.commit()
-            flash('File updated successfully!', 'success')
+            try:
+                file.filename = new_filename
+                db.session.commit()
+                flash('File updated successfully!', 'success')
+            except Exception as e:
+                flash('Failed to update file.', 'danger')
+                print("Update error:", e)
             return redirect(url_for('index'))
         else:
             flash('No filename provided!', 'danger')
@@ -87,9 +104,13 @@ def delete(file_id):
     if file.user_id != current_user.id:
         flash('Unauthorized action!', 'danger')
         return redirect(url_for('index'))
-    db.session.delete(file)
-    db.session.commit()
-    flash('File deleted successfully!', 'success')
+    try:
+        db.session.delete(file)
+        db.session.commit()
+        flash('File deleted successfully!', 'success')
+    except Exception as e:
+        flash('Failed to delete file.', 'danger')
+        print("Delete error:", e)
     return redirect(url_for('index'))
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -103,12 +124,16 @@ def register():
             if User.query.filter_by(username=username).first():
                 flash('Username already exists', 'danger')
             else:
-                new_user = User(username=username)
-                new_user.set_password(password)
-                db.session.add(new_user)
-                db.session.commit()
-                flash('Registration successful! Please log in.', 'success')
-                return redirect(url_for('login'))
+                try:
+                    new_user = User(username=username)
+                    new_user.set_password(password)
+                    db.session.add(new_user)
+                    db.session.commit()
+                    flash('Registration successful! Please log in.', 'success')
+                    return redirect(url_for('login'))
+                except Exception as e:
+                    flash('Registration failed.', 'danger')
+                    print("Registration error:", e)
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
