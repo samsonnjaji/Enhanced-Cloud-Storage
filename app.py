@@ -6,7 +6,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///cloud_storage.db')
+basedir = os.path.abspath(os.path.dirname(__file__))
+if os.environ.get('VERCEL'):
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:////tmp/cloud_storage.db')
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///' + os.path.join(basedir, 'cloud_storage.db'))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -31,6 +35,11 @@ class File(db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    print("Exception:", e)
+    return render_template("error.html"), 500
 
 @app.route('/')
 @login_required
