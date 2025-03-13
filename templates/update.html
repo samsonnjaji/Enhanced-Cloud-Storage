@@ -1,18 +1,20 @@
 {% extends "base.html" %}
 {% block title %}Update File{% endblock %}
 {% block content %}
-<div class="card mx-auto" style="max-width: 500px;">
-  <div class="card-header">
-    <h2>Update File</h2>
-  </div>
-  <div class="card-body">
-    <form method="post">
-      <div class="form-group">
-        <label for="new_filename">New Filename</label>
-        <input type="text" class="form-control" id="new_filename" name="new_filename" value="{{ file.filename }}" required>
-      </div>
-      <button type="submit" class="btn btn-primary btn-block">Update</button>
-    </form>
+<div class="container mt-5">
+  <div class="card mx-auto" style="max-width: 500px;">
+    <div class="card-header bg-primary text-white">
+      <h2 class="mb-0">Update File</h2>
+    </div>
+    <div class="card-body">
+      <form method="post">
+        <div class="form-group mb-3">
+          <label for="new_filename">New Filename</label>
+          <input type="text" class="form-control" id="new_filename" name="new_filename" value="{{ file.filename }}" required>
+        </div>
+        <button type="submit" class="btn btn-success w-100">Update</button>
+      </form>
+    </div>
   </div>
 </div>
 {% endblock %}
