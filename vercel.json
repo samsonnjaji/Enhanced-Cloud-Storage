@@ -1,5 +1,8 @@
 {
   "version": 2,
+  "env": {
+    "DATABASE_URL": "sqlite:////tmp/cloud_storage.db"
+  },
   "builds": [
     {
       "src": "app.py",
